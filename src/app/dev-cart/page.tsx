@@ -3,10 +3,18 @@ import { PRODUCTS_CATEGORY_DATA } from "tp-kit/data";
 import { Button, ProductCardLayout, SectionContainer } from "tp-kit/components";
 import {ProductCartLine} from "tp-kit/components/products";
 import {FormattedPrice} from "tp-kit/components/data-display";
-import {addLine} from "../../hooks/use-cart";
+import {addLine, computeCartTotal, useCartDataStore} from "../../hooks/use-cart";
+import {useEffect, useState} from "react";
 const products = PRODUCTS_CATEGORY_DATA[0].products.slice(0, 3);
 
 export default function DevCartPage() {
+    const lines = useCartDataStore((state) => state.lines);
+    const [total, setTotal] = useState(computeCartTotal(lines));
+
+    useEffect(() => {
+        setTotal(computeCartTotal(lines));
+    }, [lines]);
+
 
     return (
         <SectionContainer
@@ -35,6 +43,7 @@ export default function DevCartPage() {
                 <Button fullWidth>Commander</Button>
                 <Button variant={"outline"} fullWidth>Vider le panier</Button>
             </section>
+            <pre>{JSON.stringify(lines, null, 2)}</pre>
             {/* /Panier */}
         </SectionContainer>
     );
