@@ -6,6 +6,7 @@ import {addLine, clearCart, computeCartTotal, removeLine, updateLine, useCartDat
 import {useEffect, useState} from "react";
 
 const products = PRODUCTS_CATEGORY_DATA[0].products.slice(0, 3);
+console.log("rendu page");
 
 export default function DevCartPage() {
     const lines = useCartDataStore((state) => state.lines);
