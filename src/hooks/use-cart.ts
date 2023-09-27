@@ -4,6 +4,7 @@ import {ProductData} from "tp-kit/types";
 
 export const useCartDataStore = create<CartData>()((set) => ({
     lines: [],
+    count: 0,
 }))
 
 /**
@@ -28,6 +29,7 @@ export function addLine(product: ProductData) {
         }
         return {
             lines: [...state.lines, { product, qty: 1 }],
+            count: state.lines.length +1
         }
     });
 }
@@ -60,6 +62,7 @@ export function removeLine(productId: number) {
     useCartDataStore.setState((state: CartData) => {
         return {
             lines: state.lines.filter((l) => l.product.id !== productId),
+            count: state.lines.length
         }
     })
 }
@@ -68,7 +71,8 @@ export function removeLine(productId: number) {
  * Vide le contenu du panier actuel
  */
 export function clearCart() {
-    useCartDataStore.setState({ lines: [] })
+    useCartDataStore.setState({ lines: [], count:0 })
+
 }
 
 

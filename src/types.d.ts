@@ -1,4 +1,5 @@
 import {ProductData, ProductsCategoryData} from "tp-kit/types"
+import {U} from "@storybook/preview-api/dist/sortStories-243da0ce";
 
 export type ProductFiltersResult = {
   categoriesSlugs : string[],
@@ -24,5 +25,6 @@ export type ProductLineData = {
 };
 
 export type CartData = {
+  count: number;
   lines: ProductLineData[]
 }

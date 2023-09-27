@@ -1,7 +1,7 @@
 import {useCartDataStore} from "../hooks/use-cart";
 
 export function CartCounter() {
-    const count = useCartDataStore((state) => state.lines);
+    const count = useCartDataStore((state) => state.count);
     console.log("rendu counter")
 
     return (
