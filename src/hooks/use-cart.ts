@@ -38,17 +38,14 @@ export function addLine(product: ProductData) {
  */
 
 export function updateLine(line: ProductLineData) {
-    useCartDataStore((state) => {
-        const existingLineIndex = state.lines.findIndex(
-            (existingLine) => existingLine.product.id === line.product.id
-        );
+    useCartDataStore.setState((state) => {
+        const lineId = state.lines.findIndex(cartLine => cartLine.product.id === line.product.id)
 
-        if (existingLineIndex !== -1) {
-            state.lines[existingLineIndex] = { ...state.lines[existingLineIndex], ...line };
-        } else {
-            state.lines.push(line);
-        }
-    });
+        state.lines[lineId] = line
+
+        return {lines: [...state.lines]}
+    })
+
 }
 
 /**
