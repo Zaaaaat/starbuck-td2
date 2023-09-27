@@ -1,10 +1,10 @@
 "use client";
-import { PRODUCTS_CATEGORY_DATA } from "tp-kit/data";
-import { Button, ProductCardLayout, SectionContainer } from "tp-kit/components";
+import {PRODUCTS_CATEGORY_DATA} from "tp-kit/data";
+import {Button, ProductCardLayout, SectionContainer} from "tp-kit/components";
 import {ProductCartLine} from "tp-kit/components/products";
-import {FormattedPrice} from "tp-kit/components/data-display";
-import {addLine, computeCartTotal, useCartDataStore} from "../../hooks/use-cart";
+import {addLine, clearCart, computeCartTotal, removeLine, updateLine, useCartDataStore} from "../../hooks/use-cart";
 import {useEffect, useState} from "react";
+
 const products = PRODUCTS_CATEGORY_DATA[0].products.slice(0, 3);
 
 export default function DevCartPage() {
@@ -14,7 +14,6 @@ export default function DevCartPage() {
     useEffect(() => {
         setTotal(computeCartTotal(lines));
     }, [lines]);
-
 
     return (
         <SectionContainer
@@ -27,7 +26,15 @@ export default function DevCartPage() {
                     <ProductCardLayout
                         key={product.id}
                         product={product}
-                        button={<Button variant={"ghost"} onClick={() => addLine(product)} fullWidth>Ajouter au panier</Button>}
+                        button={
+                            <Button
+                                variant={"ghost"}
+                                fullWidth
+                                onClick={() => addLine(product)}
+                            >
+                                Ajouter au panier
+                            </Button>
+                        }
                     />
                 ))}
             </section>
@@ -35,16 +42,56 @@ export default function DevCartPage() {
 
             {/* Panier */}
             <section className="w-full lg:w-1/3 space-y-8">
-                {products.map((product) => (
-                    <ProductCartLine product={product} qty={1}></ProductCartLine>
-                ))}
+                <div>
+                    <p
+                        className="text-2xl mb-4"
+                    >
+                        MON PANIER
+                    </p>
+                    {
+                        lines.map((line) => (
+                            <ProductCartLine
+                                className={"mb-4"}
+                                key={line.product.id}
+                                product={line.product}
+                                qty={line.qty}
+                                onDelete={() => {
+                                    removeLine(line.product.id);
+                                }}
+                                onQtyChange={(qty) => {
+                                    if (qty === 0) {
+                                        removeLine(line.product.id);
+                                    } else {
+                                        updateLine({product: line.product, qty: qty});
+                                    }
+                                }}
+                            />
+                        ))
+                    }
+                    <div
+                        className="flex justify-between items-center mt-4"
+                    >
+                        <p>Total</p>
+                        <p>{total.toFixed(2).toString().replace('.', ',') + " €"}</p>
+                    </div>
+                </div>
 
-                Total: <FormattedPrice price={products.reduce((total, currentValue) => total = total + currentValue.price,0)}/>
-                <Button fullWidth>Commander</Button>
-                <Button variant={"outline"} fullWidth>Vider le panier</Button>
+                    <Button fullWidth>Commander</Button>
+
+                {lines.length > 0 && (
+                    <Button
+                        variant={"outline"}
+                        fullWidth
+                        onClick={() => clearCart()}
+                    >
+                        Vider le panier
+                    </Button>
+                )}
+
             </section>
-            <pre>{JSON.stringify(lines, null, 2)}</pre>
             {/* /Panier */}
+
         </SectionContainer>
+
     );
 }
