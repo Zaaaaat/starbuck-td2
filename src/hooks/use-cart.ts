@@ -1,13 +1,9 @@
-import {create} from 'zustand'
-import {ProductLineData} from "../types";
+import { create } from 'zustand'
+import {CartData, ProductLineData} from "../types";
 import {ProductData} from "tp-kit/types";
 
-interface CartData {
-    lines: ProductLineData[]
-}
-
-const useCartDataStore = create<CartData>((set) => ({
-    lines: []
+export const useCartDataStore = create<CartData>()((set) => ({
+    lines: [],
 }))
 
 /**
@@ -16,17 +12,22 @@ const useCartDataStore = create<CartData>((set) => ({
  *
  * @param product
  */
-
 export function addLine(product: ProductData) {
-    useCartDataStore((state) => {
-        const existingLineIndex = state.lines.findIndex(
-            (line) => line.product.id === product.id
-        );
-
-        if (existingLineIndex !== -1) {
-            state.lines[existingLineIndex].qty += 1;
-        } else {
-            state.lines.push({product, qty:1});
+    useCartDataStore.setState((state: CartData) => {
+        const line = state.lines.find((l) => l.product.id === product.id)
+        if (line) {
+            line.qty++
+            return {
+                lines: state.lines.map((l) => {
+                    if (l.product.id === product.id) {
+                        return line
+                    }
+                    return l
+                }),
+            }
+        }
+        return {
+            lines: [...state.lines, { product, qty: 1 }],
         }
     });
 }
@@ -36,16 +37,17 @@ export function addLine(product: ProductData) {
  *
  * @param line
  */
-
 export function updateLine(line: ProductLineData) {
-    useCartDataStore.setState((state) => {
-        const lineId = state.lines.findIndex(cartLine => cartLine.product.id === line.product.id)
-
-        state.lines[lineId] = line
-
-        return {lines: [...state.lines]}
+    useCartDataStore.setState((state: CartData) => {
+        return {
+            lines: state.lines.map((l) => {
+                if (l.product.id === line.product.id) {
+                    return line
+                }
+                return l
+            }),
+        }
     })
-
 }
 
 /**
@@ -55,27 +57,20 @@ export function updateLine(line: ProductLineData) {
  * @returns
  */
 export function removeLine(productId: number) {
-    useCartDataStore((state) => {
-        const existingLineIndex = state.lines.findIndex(
-            (line) => line.product.id === productId
-        );
-
-        if (existingLineIndex !== -1 && existingLineIndex > 1) {
-            state.lines[existingLineIndex].qty -= 1;
-        } else {
-            state.lines.splice(existingLineIndex);
+    useCartDataStore.setState((state: CartData) => {
+        return {
+            lines: state.lines.filter((l) => l.product.id !== productId),
         }
-    });
+    })
 }
 
 /**
  * Vide le contenu du panier actuel
  */
 export function clearCart() {
-    useCartDataStore((state) => {
-        state.lines.splice(0);
-    });
+    useCartDataStore.setState({ lines: [] })
 }
+
 
 /**
  * Calcule le total d'une ligne du panier
@@ -86,7 +81,7 @@ export function computeLineSubTotal(line: ProductLineData): number {
 }
 
 /**
- * Calcule le total du panie r
+ * Calcule le total du panier
  */
 export function computeCartTotal(lines: ProductLineData[]): number {
     let total = 0;
