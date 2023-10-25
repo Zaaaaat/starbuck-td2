@@ -1,8 +1,8 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 import {CartData, ProductLineData} from "../types";
 import {ProductData} from "tp-kit/types";
 
-export const useCartDataStore = create<CartData>()((set) => ({
+export const useStore = create<CartData>((set) => ({
     lines: [],
     count: 0,
 }))
@@ -14,7 +14,7 @@ export const useCartDataStore = create<CartData>()((set) => ({
  * @param product
  */
 export function addLine(product: ProductData) {
-    useCartDataStore.setState((state: CartData) => {
+    useStore.setState((state: CartData) => {
         const line = state.lines.find((l) => l.product.id === product.id)
         if (line) {
             line.qty++
@@ -29,9 +29,9 @@ export function addLine(product: ProductData) {
         }
         return {
             lines: [...state.lines, { product, qty: 1 }],
-            count: state.lines.length +1
+            count: state.count + 1,
         }
-    });
+    })
 }
 
 /**
@@ -40,7 +40,7 @@ export function addLine(product: ProductData) {
  * @param line
  */
 export function updateLine(line: ProductLineData) {
-    useCartDataStore.setState((state: CartData) => {
+    useStore.setState((state: CartData) => {
         return {
             lines: state.lines.map((l) => {
                 if (l.product.id === line.product.id) {
@@ -59,10 +59,10 @@ export function updateLine(line: ProductLineData) {
  * @returns
  */
 export function removeLine(productId: number) {
-    useCartDataStore.setState((state: CartData) => {
+    useStore.setState((state: CartData) => {
         return {
             lines: state.lines.filter((l) => l.product.id !== productId),
-            count: state.lines.length
+            count: state.count - 1,
         }
     })
 }
@@ -71,28 +71,19 @@ export function removeLine(productId: number) {
  * Vide le contenu du panier actuel
  */
 export function clearCart() {
-    useCartDataStore.setState({ lines: [], count:0 })
-
+    useStore.setState({ lines: [], count: 0 })
 }
-
 
 /**
  * Calcule le total d'une ligne du panier
  */
-
 export function computeLineSubTotal(line: ProductLineData): number {
-    return line.product.price * line.qty;
+    return line.product.price * line.qty
 }
 
 /**
  * Calcule le total du panier
  */
 export function computeCartTotal(lines: ProductLineData[]): number {
-    let total = 0;
-
-    for (const line of lines) {
-        total += computeLineSubTotal(line);
-    }
-
-    return total;
+    return lines.reduce((acc, line) => acc + computeLineSubTotal(line), 0)
 }

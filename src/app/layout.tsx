@@ -22,21 +22,21 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
+      <html lang="fr">
       <body className={font.className}>
-        <Menu />
+      <Menu />
 
-        <Providers font={font}>
-          {children}
-        </Providers>
+      <Providers font={font}>
+        {children}
+      </Providers>
 
-        <Footer />
+      <Footer />
       </body>
-    </html>
+      </html>
   )
 }
